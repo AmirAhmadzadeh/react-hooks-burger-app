@@ -1,0 +1,15 @@
+
+
+
+.content{
+    margin-top: 66px;
+}
+
+
+
+@media(min-width:500px){
+
+   .ShowSideDrawer{
+       display: none ;
+   }
+}
