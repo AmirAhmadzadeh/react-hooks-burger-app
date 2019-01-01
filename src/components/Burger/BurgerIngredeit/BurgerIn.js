@@ -1,6 +1,5 @@
 import classes from './BurgerIndeint.css';
 import propTypes from 'prop-types';
-
 import React, { Component } from 'react'
 
 class BurgerIn extends Component {

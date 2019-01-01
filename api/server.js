@@ -39,6 +39,16 @@ router.get("/getData", (req, res) => {
   //
 });
 
+router.get('/orders' , async(req,res) => {
+
+      console.log(`[in server ]`) ;
+      const orders = await order.find({});
+      res.json(orders);  
+
+ }) ;
+
+
+
 // this is our update method
 // this method overwrites existing data in our database
 router.post("/createOrder",async(req, res) => {
