@@ -52,4 +52,4 @@ BurgerIn.propTypes = {
 
 
 
-export default  BurgerIn
+export default BurgerIn ; 

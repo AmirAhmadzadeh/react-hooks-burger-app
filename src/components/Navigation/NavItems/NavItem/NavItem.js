@@ -10,7 +10,8 @@ const navItem = (props) => {
     return ( 
         <li className={classes.NavItem}>
         <NavLink to={{pathname : props.link}}
-           activeClassName={props.active ? classes.active:null}
+           exact
+           activeClassName={classes.active}
            >
             {props.children}
         </NavLink>

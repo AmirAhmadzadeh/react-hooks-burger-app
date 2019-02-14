@@ -13,9 +13,20 @@ const orederModel = new schema({
     }
     ,
 
-    custumer : {
-        type : schema.Types.ObjectId , ref : "custumers"
+    name : {
+        type : String , required: true 
+    } , 
+
+    email : {
+        type :String  , required :true 
     }
+     , 
+    address : {
+        type : String , required : true 
+    }
+   /* custumer : {
+        type : schema.Types.ObjectId , ref : "custumers"
+    }*/ 
 
 }) ;
 

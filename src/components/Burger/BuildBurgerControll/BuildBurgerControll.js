@@ -31,9 +31,10 @@ const BuildBurgerControll = (props) => {
                    })
               }
 
-             <button className={classes.OrderButton} 
-             disabled={!props.purchaseable}
-              onClick={props.ordered}
+             <button 
+                className={classes.OrderButton} 
+                disabled={!props.purchaseable}
+                onClick={props.ordered}
              >ORDER</button> 
 
         </div> 

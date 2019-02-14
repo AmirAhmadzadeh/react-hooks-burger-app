@@ -2,11 +2,11 @@
 
    margin: auto ;
    width: 100% ; 
-   overflow: scroll;
+   overflow: overlay;
    height:250px ;
-  text-align: center;
-  font-weight: bold ;
-  font-size: 1.2rem ;
+   text-align: center;
+   font-weight: bold ;
+   font-size: 1.2rem ;
 
 }
 

@@ -1,51 +1,46 @@
-
-
 import React, { Component } from 'react'
 import CheckOutSummery from '../../components/Order/CheckOutSummery/CheckOutSummery';
-import classes from './CheckOut.css';
 import Aux from '../../hoc/Aux';
-import { Route } from 'react-router-dom' ;
-import ContactData from './../../containers/CheckOut/ContactData/ContactData' ;
+import { Route , Redirect } from 'react-router-dom';
+import ContactData from './ContactData/ContactData';
+import { connect } from 'react-redux';
 
 
-export default class CheckOut extends Component {
+class CheckOut extends Component {
 
 
-  state = {
-    ingredients: {}
-  }
 
   continueHandler = () => {
-    
-    this.props.history.replace('/checkout/catact-data');
+
+    this.props.history.replace('/checkout/contact-data');
   }
+
+
   cancelHandler = () => {
 
     this.props.history.goBack();
   }
-  componentDidMount(){
-    console.log('[in checkout]');
-    const query = new URLSearchParams(this.props.location.search);   
-    const ingredients = {}  ; 
-    for(let param of query.entries()){   
-      ingredients[param[0]]  = +param[1] ; 
-    }   
-    this.setState({ingredients});
-  }
+
+
+
 
   render() {
-    
+    console.log(`error ` , this.props.error);
+    let redirectIfisEmpty = null;
+    if (Object.keys(this.props.ings).length === 0) {
+      redirectIfisEmpty = <Redirect to="/" />
+    }
+
+
     return (
       <Aux>
-        <CheckOutSummery ingredients={this.state.ingredients} />
-      
-        <div className={classes.ButtonArea}>
-          <div className={classes.Button} onClick={this.continueHandler}>continue</div>
-          <div className={classes.Button} onClick={this.cancelHandler} >cancel</div>
-        </div>
-
-
-       <Route path="/checkout/contact-data" exact  component={ContactData}/>
+        {redirectIfisEmpty}
+        <CheckOutSummery
+          ingredients={this.props.ings}
+          cancel={this.cancelHandler}
+          continue={this.continueHandler}
+        />
+      <Route path="/checkout/contact-data" component={ContactData} /> 
 
       </Aux>
     )
@@ -53,6 +48,16 @@ export default class CheckOut extends Component {
 }
 
 
-/*
-  what's diffrent between forin and for of
-*/
+
+
+const mapStatesToProps = state => {
+
+  return {
+    ings: state.burgerBuilder.ings 
+  }
+}
+
+
+
+export default connect(mapStatesToProps)(CheckOut);
+
