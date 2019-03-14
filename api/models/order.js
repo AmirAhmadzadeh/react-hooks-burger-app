@@ -23,11 +23,11 @@ const orederModel = new schema({
      , 
     address : {
         type : String , required : true 
-    }
-   /* custumer : {
+    }   , 
+   costumer : {
         type : schema.Types.ObjectId , ref : "custumers"
-    }*/ 
+    } 
 
 }) ;
 
-module.exports = mongoose.model('orders' , orederModel)
+module.exports = mongoose.model('orders' , orederModel) ; 

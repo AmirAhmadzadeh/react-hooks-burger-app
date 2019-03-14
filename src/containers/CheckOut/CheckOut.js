@@ -25,7 +25,6 @@ class CheckOut extends Component {
 
 
   render() {
-    console.log(`error ` , this.props.error);
     let redirectIfisEmpty = null;
     if (Object.keys(this.props.ings).length === 0) {
       redirectIfisEmpty = <Redirect to="/" />

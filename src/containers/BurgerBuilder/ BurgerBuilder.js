@@ -9,6 +9,8 @@ import { connect } from 'react-redux';
 import * as actions from './../../store/actions/index';
 import { Redirect } from 'react-router-dom';
 
+
+
 class BurgerBuilder extends Component {
 
   constructor(props) {
@@ -17,7 +19,6 @@ class BurgerBuilder extends Component {
 
       loading: false,
       purchasing: false
-
     }
 
   }
@@ -25,7 +26,7 @@ class BurgerBuilder extends Component {
   componentWillMount() {
 
     this.props.initIngredients();
-    console.log(`[in componentWillMount]`, this.props.ings);
+
   }
 
   updatePurchase = (ingredients) => {
@@ -45,9 +46,19 @@ class BurgerBuilder extends Component {
 
   purchaseHandler = () => {
 
+
+    if (!this.props.auth.info.auth) {
+        if ( this.props.building ) { 
+          this.props.setRedirectPath('/checkout') ; 
+        }
+       
+        this.props.history.push('/auth') ;
+    }
+   
     this.setState({
       purchasing: true
     });
+
   }
 
   purchaseCancelHandler = () => {
@@ -62,6 +73,7 @@ class BurgerBuilder extends Component {
 
     this.props.history.push('/checkout');
   }
+
 
 
   render() {
@@ -88,33 +100,35 @@ class BurgerBuilder extends Component {
     );
 
     if (this.state.loading) ordersummary = <Spinner />;
-
     else if (this.state.enrollerdRequest) rolledMessage = <p>thanks for youre choice </p>;
 
 
 
     return (
       <div>
-        {this.props.error ? <Redirect to="/error" /> :
-         <Aux>
-          <Modal show={this.state.purchasing}
-            closeModal={this.purchaseCancelHandler}
-          >
-            {ordersummary}
-            {rolledMessage}
-          </Modal>
-          <Burger ingredients={this.props.ings} />
-          <BurgerBuildController
-            less={(type) => this.props.lessHandeler(type)}
-            more={(type) => this.props.moreHandeler(type)}
-            disabled={disabledInfo}
-            price={this.props.totalPrice}
-            purchaseable={this.updatePurchase(this.props.ings)}
-            ordered={this.purchaseHandler}
-          />
-        </Aux>
+        {
+          this.props.error ? <Redirect to="/error" /> :
+            <Aux>
+              <Modal
+                show={this.state.purchasing}
+                closeModal={this.purchaseCancelHandler}
+              >
+                {ordersummary}
+                {rolledMessage}
+              </Modal>
+              <Burger ingredients={this.props.ings} />
+              <BurgerBuildController
+                less={(type) => this.props.lessHandeler(type)}
+                more={(type) => this.props.moreHandeler(type)}
+                disabled={disabledInfo}
+                price={this.props.totalPrice}
+                purchaseable={this.updatePurchase(this.props.ings)}
+                ordered={this.purchaseHandler}
+                isAuthenticated={this.props.auth.info.auth}
+              />
+            </Aux>
         }
-        </div>
+      </div>
     )
   }
 }
@@ -125,7 +139,9 @@ const mapStatesToProps = state => {
   return {
     ings: state.burgerBuilder.ings,
     totalPrice: state.burgerBuilder.totalPrice,
-    error: state.burgerBuilder.error
+    building  : state.burgerBuilder.building , 
+    error: state.burgerBuilder.error,
+    auth: state.auth
   }
 
 }
@@ -136,9 +152,9 @@ const mapDispatchesToProps = dispatch => {
 
     lessHandeler: (ingName) => dispatch(actions.removeIngs(ingName)),
     moreHandeler: (ingName) => dispatch(actions.addIngs(ingName)),
-    initIngredients: () => dispatch(actions.initialIngs())
+    initIngredients: () => dispatch(actions.initialIngs()),
+    setRedirectPath : (path) => dispatch(actions.setAuthRedirect(path))
   }
-
 }
 
 

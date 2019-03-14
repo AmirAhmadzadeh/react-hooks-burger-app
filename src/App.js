@@ -1,30 +1,43 @@
 import React, { Component } from 'react';
 import Layout from './components/Layout/Layout';
-import BurgerBuilder from './containers/BurgerBuilder/ BurgerBuilder';
-import { Route } from 'react-router-dom';
-import Checkout from './containers/CheckOut/CheckOut';
-import Aux from './hoc/Aux' ;
-import Orders from './containers/Orders/Orders' ; 
-import ErrorComponent from './components/Error/Error'
-import Auth from './containers/Auth/Auth'
+import Aux from './hoc/Aux';
+import Routes from './Routes/Routes';
+import { connect } from 'react-redux';
+import * as actions from './store/actions/index';
+import { withRouter } from 'react-router-dom';
 
+class App extends Component {
 
- class App extends Component {
-  render() {
-    return (
-    
-         <Aux>
-          <Layout>                       
-              <Route path="/" exact component={BurgerBuilder}/>
-              <Route path="/checkout"  component={Checkout}/>
-              <Route path="/orders"  component={Orders} /> 
-              <Route path="/auth" component={Auth} />
-              <Route path="/error" component={ErrorComponent} />
-          </Layout>
-       </Aux>
-    )
-  }
+    componentDidMount = () => {
+
+        this.props.checkUser();
+    }
+
+    render() {
+        return (
+
+            <Aux>
+                <Layout>
+                    <Routes authenticated={this.props.auth.info.auth} />
+                </Layout>
+            </Aux>
+        )
+    }
 }
 
 
-export default App;
+
+const mapDispatchToProps = dispatch => {
+
+    return {
+        checkUser: () => dispatch(actions.authCheck())
+    }
+}
+
+const mapStateToProps = state => { 
+
+    return  {
+          auth : state.auth   
+    }
+}
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));

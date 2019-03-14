@@ -3,126 +3,203 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require('cors');
 const order = require('./models/order');
-//const logger = require("morgan") ;
-const API_PORT = 3001;
+const API_PORT = 8080;
 const app = express();
+const User = require('./models/custumer');
+const pass = require('passport');
+app.use(pass.initialize());
+const passport = require('./passport/passport');
+const jwt = require('jsonwebtoken')
 const router = express.Router();
 app.use(cors());
-
-
-
+const path = require('path');
 const dbRoute = "mongodb://localhost:27017/burger-api";
-
+const jwtSecret = require('./passport/jwtSecret');
 mongoose.Promise = global.Promise;
-
 mongoose.connect(
       dbRoute,
       { useNewUrlParser: true }
 );
-
 let db = mongoose.connection;
-
-
 db.once("open", () => console.log("connected to the database"));
-
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
-
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
 
-const path = require('path');
-
-/*
-router.get('*', (req, res) => {
-      console.log(path.join(__dirname, "client" , "build"))
-      res.sendFile(path.join(__dirname, "client" , "build" , "index.html")) ;
-}); */
-
-router.get('/orders', async (req, res) => {
-
-      const orders = await order.find({});
 
 
-      const ordersFetched = orders.filter((elm) => {
-            return elm._id != "5c4873331f8aa6d1b0461742";
-      })
 
-      res.json(ordersFetched);
 
-});
+//  sign up 
 
+const bcrypt = require('bcryptjs');
+
+router.post('/sign-up',
+      (req, res, next) => {
+
+            passport.authenticate('register',
+                  (err, user, info) => {
+                        if (err) {
+                              console.error(err);
+                        }
+                        if (info !== undefined) {
+                              console.error(info.message);
+                              res.status(403).json({
+                                    message: info.message,
+                                    status: false
+                              });
+                        } else {
+
+                              req.logIn(user, error => {
+                                    if (error) {
+                                          console.log(`[ Error in register costumer ]`, error);
+                                    }
+                                    console.log(`user created `)
+                                    console.log(user);
+
+                                    res.status(200).json({
+                                          message: 'user created',
+                                          status: true,
+                                    });
+
+                              });
+                        }
+                  })(req, res, next);
+      }
+)
+
+// log in 
+router.post('/log-In',
+      (req, res, next) => {
+            passport.authenticate('login',
+                  (err, users, info) => {
+                        if (err) {
+                              console.error(`error In login  ${err}`);
+                        }
+                        if (info !== undefined) {
+                              console.error(info.message);
+                              if (info.message === 'bad username') {
+                                    res.status(401).send(info.message);
+                              } else {
+                                    res.status(403).send(info.message);
+                              }
+                        } else {
+                              req.logIn(users, () => {
+                                    User.findOne({ email: req.body.email })
+                                          .then((user) => {
+                                                const token = jwt.sign({ id: user.id }, jwtSecret.secret);
+                                                console.log(`user founded successfully`);
+                                                res.status(200).json({
+                                                      status: true,
+                                                      message: 'user found & logged in',
+                                                      token: token,
+                                                      email: user.email
+                                                });
+                                          });
+                              });
+                        }
+                  })(req, res, next);
+      });
+
+
+
+
+router.get('/findUser',
+      (req, res, next) => {
+
+            console.log(`[test purposes]`, req.query);
+            passport.authenticate('jwt',
+                  { session: false },
+
+                  (err, user, info) => {
+
+                        if (err) {
+
+                              console.error(err);
+                        }
+                        if (info !== undefined) {
+
+                              console.log(info.message);
+                              res.status(401).send(info.message);
+
+                        }
+                        else if (user.email === req.query.email) {
+
+                              User.findOne({
+                                    email: req.query.email
+                              })
+                                    .then((userInfo) => {
+
+                                          if (userInfo != null) {
+                                                console.log('user found in db from findUsers');
+                                                res.status(200).send({
+                                                      auth: true,
+                                                      user: userInfo,
+                                                      message: " user founded and authenticated "
+                                                });
+                                          } else {
+                                                console.error('no user exists in db with that username');
+                                                res.status(401).send(
+                                                      {
+                                                            message: 'no user exists in db with that username',
+                                                            auth: false
+                                                      }
+                                                );
+                                          }
+                                    });
+                        } else {
+                              console.error('jwt id and username do not match');
+                              res.status(403).send('username and jwt token do not match');
+                        }
+                  })(req, res, next);
+      });
+
+
+
+
+// inintial ings 
 router.get('/initIngs', async (req, res) => {
 
-
-      const initIng = await order.findById("5c4873331f8aa6d1b0461742");
+      const initIng = {
+            salad: 0,
+            bacon: 0,
+            cheese: 0,
+            meat: 0
+      };
       res.json(initIng);
+});
+
+
+//  ordeer 
+
+// change  
+router.post('/orders', async (req, res) => {
+      
+      // console.log('[amir is here for testing purposes]', req.body);
+    
+      const fetchOrders = await order.find({  costumer : req.body.userId })
+      // console.log(fetchOrders) ;
+      res.json(fetchOrders);
 });
 
 
 router.post("/createOrder", async (req, res) => {
 
-
       try {
 
-            console.log(`[hello it works  :) ]`, req.body.data);
             const newOrder = new order({ ...req.body.data });
-            console.log(`new order is []  :`, newOrder);
             const err = await newOrder.save();
             res.json(`[order saved successfully]`);
 
       } catch (error) {
-
             console.log(`we have some error dear developer ${error}`);
       }
 
 });
 
-router.delete("/deleteData", (req, res) => {
-      //
-});
 
-router.post("/putData", (req, res) => {
-
-
-
-});
-
-
-const Custumer = require('./models/custumer');
-
-//  sign up 
-
-
-router.post('/sign-up', async (req, res) => {
-
-      const { password, email } = req.body;
-
-      const newCustumer = new Custumer({
-            password, email
-      });
-
-
-      newCustumer.save()
-            .then(async custumer => {
-
-                  const token = await newCustumer.generateAuthToken();
-                  // console.log(`[test the token] ==> `, token);
-                  const { email , _id } = custumer ;
-                  res.header('x-auth' , token).json({ email , _id }) ;
-            })
-            .catch(err => {
-                   console.log(`seems to have some errors dear amir` , err);     
-            })
-
-
-
-});
-
-
-// app.post('/sign-in') ;
 
 
 

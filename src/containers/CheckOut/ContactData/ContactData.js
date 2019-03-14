@@ -83,7 +83,8 @@ class ContactData extends Component {
             price: this.props.totalPrice,
             name: this.state.orderForm.name.value,
             address: this.state.orderForm.address.value,
-            email: this.state.orderForm.email.value
+            email: this.state.orderForm.email.value,
+            costumer : this.props.user._id
 
         }
         this.props.orderCreatorHandler(order);
@@ -93,7 +94,7 @@ class ContactData extends Component {
 
     validationData = (value, target) => {
 
-        console.log(target, value);
+        // console.log(target, value);
 
 
         switch (target) {
@@ -107,7 +108,7 @@ class ContactData extends Component {
                     newElemet.value = value;
                     newForm[target] = newElemet;
                     this.setState({ orderForm: newForm });
-                    console.log("name is okay ")
+                    // console.log("name is okay ")
                 } else {
                     const newForm = { ...this.state.orderForm }
                     const newElemet = { ...newForm[target] }
@@ -133,7 +134,7 @@ class ContactData extends Component {
                     newElemet.value = value;
                     newForm[target] = newElemet;
                     this.setState({ orderForm: newForm });
-                    console.log("email is okay ")
+                    // console.log("email is okay ")
                 } else {
                     const newForm = { ...this.state.orderForm }
                     const newElemet = { ...newForm[target] }
@@ -154,7 +155,7 @@ class ContactData extends Component {
                     newForm[target] = newElemet;
 
                     this.setState({ orderForm: newForm });
-                    console.log("address is okay ")
+                    // console.log("address is okay ")
                 } else {
                     const newForm = { ...this.state.orderForm }
                     const newElemet = { ...newForm[target] }
@@ -167,7 +168,7 @@ class ContactData extends Component {
                 break;
 
             case "code":
-                console.log(+value);
+                // console.log(+value);
                 if (+value && +value > 1000) {
 
                     const newForm = { ...this.state.orderForm }
@@ -177,7 +178,7 @@ class ContactData extends Component {
                     newForm[target] = newElemet;
 
                     this.setState({ orderForm: newForm });
-                    console.log("code is okay ")
+                    // console.log("code is okay ")
                 } else {
                     const newForm = { ...this.state.orderForm }
                     const newElemet = { ...newForm[target] }
@@ -186,7 +187,7 @@ class ContactData extends Component {
                     newForm[target] = newElemet;
 
                     this.setState({ orderForm: newForm });
-                    console.log("code is not okay ")
+                    // console.log("code is not okay ")
                 }
                 break;
 
@@ -194,7 +195,6 @@ class ContactData extends Component {
                 break;
         }
 
-        // console.log(this.state.orderForm[target]);
         const { name, code, email, address } = this.state.orderForm;
 
         if (address.validation && code.validation && email.validation && name.validation) return true;
@@ -204,7 +204,6 @@ class ContactData extends Component {
     }
     inputChangedHandler = (event, target) => {
 
-        console.log(event.target.value, target);
         const newForm = { ...this.state.orderForm }
         const newElemet = { ...newForm[target] };
         newElemet.value = event.target.value;
@@ -298,7 +297,7 @@ const mapStatesToProps = state => {
     return {
         ings: state.burgerBuilder.ings,
         totalPrice: state.burgerBuilder.totalPrice,
-
+        user : state.auth.user   
     }
 }
 
