@@ -9,10 +9,8 @@ import { withRouter } from 'react-router-dom';
 class App extends Component {
 
     componentDidMount = () => {
-
         this.props.checkUser();
     }
-
     render() {
         return (
 
@@ -34,8 +32,8 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-const mapStateToProps = state => { 
 
+const mapStateToProps = state => { 
     return  {
           auth : state.auth   
     }

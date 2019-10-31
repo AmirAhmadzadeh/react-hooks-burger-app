@@ -1,58 +1,50 @@
-import React, { Component } from 'react'
+import React  from 'react'
+
 import CheckOutSummery from '../../components/Order/CheckOutSummery/CheckOutSummery';
-import Aux from '../../hoc/Aux';
-import { Route , Redirect } from 'react-router-dom';
+
+import { Route, Redirect } from 'react-router-dom';
+
 import ContactData from './ContactData/ContactData';
+
 import { connect } from 'react-redux';
 
 
-class CheckOut extends Component {
+ 
 
+function CheckOut(props) {
 
-
-  continueHandler = () => {
-
-    this.props.history.replace('/checkout/contact-data');
+  const continueHandler = () => {
+    props.history.replace('/checkout/contact-data');
   }
 
-
-  cancelHandler = () => {
-
-    this.props.history.goBack();
+  const cancelHandler = () => {
+    props.history.goBack();
   }
 
-
-
-
-  render() {
-    let redirectIfisEmpty = null;
-    if (Object.keys(this.props.ings).length === 0) {
-      redirectIfisEmpty = <Redirect to="/" />
-    }
-
-
-    return (
-      <Aux>
-        {redirectIfisEmpty}
-        <CheckOutSummery
-          ingredients={this.props.ings}
-          cancel={this.cancelHandler}
-          continue={this.continueHandler}
-        />
-      <Route path="/checkout/contact-data" component={ContactData} /> 
-
-      </Aux>
-    )
+  let redirectIfisEmpty = null;
+  
+  if (Object.keys(props.ings).length === 0) {
+    redirectIfisEmpty = <Redirect to="/" />
   }
+
+  return (
+    <React.Fragment>
+      {redirectIfisEmpty}
+      <CheckOutSummery
+        ingredients={props.ings}
+        cancel={cancelHandler}
+        continue={continueHandler}
+      />
+      <Route path="/checkout/contact-data" component={ContactData} />
+
+    </React.Fragment>
+  )
 }
-
-
-
 
 const mapStatesToProps = state => {
 
   return {
-    ings: state.burgerBuilder.ings 
+    ings: state.burgerBuilder.ings
   }
 }
 
