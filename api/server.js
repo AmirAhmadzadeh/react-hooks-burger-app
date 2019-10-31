@@ -6,9 +6,13 @@ const order = require('./models/order');
 const API_PORT = 8080;
 const app = express();
 const User = require('./models/custumer');
+
+//passport configuration 
 const pass = require('passport');
 app.use(pass.initialize());
 const passport = require('./passport/passport');
+
+
 const jwt = require('jsonwebtoken')
 const router = express.Router();
 app.use(cors());
@@ -30,8 +34,6 @@ app.use(bodyParser.json());
 
 
 
-
-
 //  sign up 
 
 const bcrypt = require('bcryptjs');
@@ -42,11 +44,18 @@ router.post('/sign-up',
             passport.authenticate('register',
                   (err, user, info) => {
                         if (err) {
-                              console.error(err);
+
+                              // console.log(`amir error `);
                         }
                         if (info !== undefined) {
-                              console.error(info.message);
-                              res.status(403).json({
+                              // console.error(info.message);
+                              // console.log('[ amir is here right now ]') ; 
+                              // res.status(403).json({
+                              //       message: info.message , 
+                              //       status: false
+                              // });
+
+                              return res.json({
                                     message: info.message,
                                     status: false
                               });
@@ -54,10 +63,10 @@ router.post('/sign-up',
 
                               req.logIn(user, error => {
                                     if (error) {
-                                          console.log(`[ Error in register costumer ]`, error);
+                                          console.log(`[ Error in register costumer  :| ]`, error);
                                     }
-                                    console.log(`user created `)
-                                    console.log(user);
+                                    // console.log(`user created `)
+                                    // console.log(user);
 
                                     res.status(200).json({
                                           message: 'user created',
@@ -70,26 +79,31 @@ router.post('/sign-up',
       }
 )
 
-// log in 
+// log in
+// sign in 
 router.post('/log-In',
       (req, res, next) => {
             passport.authenticate('login',
                   (err, users, info) => {
                         if (err) {
-                              console.error(`error In login  ${err}`);
+                              console.error(`error In login `);
                         }
                         if (info !== undefined) {
+                              console.error(`amir is here `);
                               console.error(info.message);
                               if (info.message === 'bad username') {
-                                    res.status(401).send(info.message);
+                                    // res.status(401).send(info.message);
+                                    res.json({ status: false, message: info.message });
                               } else {
-                                    res.status(403).send(info.message);
+                                    // res.status(403).send(info.message);
+                                    res.json({ status: false, message: info.message });
                               }
                         } else {
                               req.logIn(users, () => {
                                     User.findOne({ email: req.body.email })
                                           .then((user) => {
-                                                const token = jwt.sign({ id: user.id }, jwtSecret.secret);
+                                                const token = jwt.sign({ id: user.id },
+                                                      jwtSecret.secret);
                                                 console.log(`user founded successfully`);
                                                 res.status(200).json({
                                                       status: true,
@@ -97,6 +111,7 @@ router.post('/log-In',
                                                       token: token,
                                                       email: user.email
                                                 });
+                                                // res.redirect(`/findUser/${req.body.email}`) ; 
                                           });
                               });
                         }
@@ -106,10 +121,13 @@ router.post('/log-In',
 
 
 
+
+
+
 router.get('/findUser',
       (req, res, next) => {
 
-            console.log(`[test purposes]`, req.query);
+            // console.log(`[test purposes]`, req.query);
             passport.authenticate('jwt',
                   { session: false },
 
@@ -133,14 +151,14 @@ router.get('/findUser',
                                     .then((userInfo) => {
 
                                           if (userInfo != null) {
-                                                console.log('user found in db from findUsers');
+                                                // console.log('user found in db from findUsers');
                                                 res.status(200).send({
                                                       auth: true,
                                                       user: userInfo,
                                                       message: " user founded and authenticated "
                                                 });
                                           } else {
-                                                console.error('no user exists in db with that username');
+                                                // console.error('no user exists in db with that username');
                                                 res.status(401).send(
                                                       {
                                                             message: 'no user exists in db with that username',
@@ -150,7 +168,7 @@ router.get('/findUser',
                                           }
                                     });
                         } else {
-                              console.error('jwt id and username do not match');
+                              // console.error('jwt id and username do not match');
                               res.status(403).send('username and jwt token do not match');
                         }
                   })(req, res, next);
@@ -176,11 +194,9 @@ router.get('/initIngs', async (req, res) => {
 
 // change  
 router.post('/orders', async (req, res) => {
-      
-      // console.log('[amir is here for testing purposes]', req.body);
-    
-      const fetchOrders = await order.find({  costumer : req.body.userId })
-      // console.log(fetchOrders) ;
+
+
+      const fetchOrders = await order.find({ costumer: req.body.userId })
       res.json(fetchOrders);
 });
 
