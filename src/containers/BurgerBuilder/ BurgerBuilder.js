@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import Aux from '../../hoc/Aux';
 import Burger from './../../components/Burger/Burger';
 import BurgerBuildController from '../../components/Burger/BuildBurgerControll/BuildBurgerControll';
 import Modal from './../../components/UI/Modal/Modal';
 import OrderSummery from './../../components/Burger/Ordersummery/Ordersummery';
 import Spinner from './../../components/UI/Spinner/Spinner';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector  } from 'react-redux';
 import * as actions from './../../store/actions/index';
 import { Redirect } from 'react-router-dom';
 import useBoolean from '../../hooks/useBoolean';
@@ -13,17 +13,31 @@ import useBoolean from '../../hooks/useBoolean';
 function BurgerBuilder(props) {
 
   const [loading, toggleLoading, setLoading] = useBoolean(false);
-
   const [purchasing, togglePurchasing, setPurchasing] = useBoolean(false);
+  const ings = useSelector(state =>  state.burgerBuilder.ings ) ; 
+  const auth = useSelector(state =>  state.auth ) ; 
+  const totalPrice = useSelector(state => state.burgerBuilder.totalPrice) ; 
+  const error = useSelector (state => state.burgerBuilder.error );
+  const building = useSelector(state => state.burgerBuilder.building ) ; 
+  const dispatch = useDispatch();
+  useCallback((ingName) => dispatch(actions.removeIngs(ingName)),[input],)
+
+  const lessHandeler =  (ingName) => dispatch(actions.removeIngs(ingName));
+  
+  const moreHandeler = (ingName) => dispatch(actions.addIngs(ingName));
+  
+  const initIngredients = useCallback(() => dispatch(actions.initialIngs()) , [dispatch]);
+  
+  const setRedirectPath = (path) => dispatch(actions.setAuthRedirect(path))
 
   useEffect(() => {
 
-    
-      console.log('[use Effect :_ ]')
-      props.initIngredients();
 
-     
-  } ,[]);
+    console.log('[use Effect :_ ]')
+    initIngredients();
+
+
+  }, []);
 
   const updatePurchase = (ingredients) => {
 
@@ -41,35 +55,24 @@ function BurgerBuilder(props) {
 
   const purchaseHandler = () => {
 
-    console.log('helloooooo ] ' , props.auth, props.building) ; 
-    if (!props.auth.info.auth) {
-
-      if (props.building) {
-
-        props.setRedirectPath('/checkout');
-
+    console.log('helloooooo ] ', auth, building);
+    if (!auth.info.auth) {
+      if (building) {
+        setRedirectPath('/checkout');
       }
-
       props.history.push('/auth');
-
     }
-
     setPurchasing(true);
-
   }
 
 
   const purchaseCancelHandler = () => {
-
     setPurchasing(false);
-
   }
 
 
   const purchaseContinueHandler = () => {
-
     props.history.push('/checkout');
-
   }
 
   const getOrderSummary = () => {
@@ -86,9 +89,9 @@ function BurgerBuilder(props) {
 
         cancelProcess={purchaseCancelHandler}
 
-        ingrideints={props.ings}
+        ingrideints={ings}
 
-        totalPrice={props.totalPrice}
+        totalPrice={totalPrice}
 
       />
 
@@ -98,7 +101,7 @@ function BurgerBuilder(props) {
 
   const disabledInfo = {
 
-    ...props.ings
+    ...ings
 
   };
 
@@ -114,7 +117,7 @@ function BurgerBuilder(props) {
 
       {
 
-        props.error ? <Redirect to="/error" /> :
+        error ? <Redirect to="/error" /> :
 
           <Aux>
 
@@ -132,23 +135,23 @@ function BurgerBuilder(props) {
 
             </Modal>
 
-            <Burger ingredients={props.ings} />
+            <Burger ingredients={ings} />
 
             <BurgerBuildController
 
-              less={(type) => props.lessHandeler(type)}
+              less={(type) => lessHandeler(type)}
 
-              more={(type) => props.moreHandeler(type)}
+              more={(type) => moreHandeler(type)}
 
               disabled={disabledInfo}
 
-              price={props.totalPrice}
+              price={totalPrice}
 
-              purchaseable={updatePurchase(props.ings)}
+              purchaseable={updatePurchase(ings)}
 
               ordered={purchaseHandler}
 
-              isAuthenticated={props.auth.info.auth}
+              isAuthenticated={auth.info.auth}
 
             />
 
@@ -163,38 +166,8 @@ function BurgerBuilder(props) {
 }
 
 
-const mapStatesToProps = state => {
-
-  return {
-
-    ings: state.burgerBuilder.ings,
-
-    totalPrice: state.burgerBuilder.totalPrice,
-
-    building: state.burgerBuilder.building,
-
-    error: state.burgerBuilder.error,
-
-    auth: state.auth
-  }
-
-}
-
-const mapDispatchesToProps = dispatch => {
-
-  return {
-
-    lessHandeler: (ingName) => dispatch(actions.removeIngs(ingName)),
-
-    moreHandeler: (ingName) => dispatch(actions.addIngs(ingName)),
-
-    initIngredients: () => dispatch(actions.initialIngs()),
-
-    setRedirectPath: (path) => dispatch(actions.setAuthRedirect(path))
-  }
-}
 
 
-export default connect(mapStatesToProps, mapDispatchesToProps)(BurgerBuilder);
+export default BurgerBuilder;
 
 
