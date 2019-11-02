@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { usememo } from 'react';
 import classes from './Modal.css';
 import Backdrop from './../../UI/Bsckdrop/BackDrop';
 
 
 
-function Modal(props) {
+function modal(props) {
 
 
     return (
@@ -21,8 +21,8 @@ function Modal(props) {
                 }
             >
 
-                {useMemo(() => props.children, [props.show])}
-                {/* {props.children} */}
+                {/* {useMemo(() => props.children, [props.show])} */}
+                {props.children}
             </div>
 
 
@@ -32,7 +32,12 @@ function Modal(props) {
     );
 }
 // check this after 
-export default React.useMemo(Modal , (prevProps , nextProps) => (nextProps.show === prevProps.show) || (nextProps.show === prevProps.show) );
+
+export default React.memo(modal,
+    (prevProps, nextProps) => {
+        return (nextProps.show === prevProps.show) || (nextProps.show === prevProps.show)
+    }
+);
 
 
 

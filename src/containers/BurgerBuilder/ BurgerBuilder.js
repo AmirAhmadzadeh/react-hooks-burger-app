@@ -5,7 +5,7 @@ import BurgerBuildController from '../../components/Burger/BuildBurgerControll/B
 import Modal from './../../components/UI/Modal/Modal';
 import OrderSummery from './../../components/Burger/Ordersummery/Ordersummery';
 import Spinner from './../../components/UI/Spinner/Spinner';
-import { connect, useDispatch, useSelector  } from 'react-redux';
+import {  useDispatch, useSelector  } from 'react-redux';
 import * as actions from './../../store/actions/index';
 import { Redirect } from 'react-router-dom';
 import useBoolean from '../../hooks/useBoolean';
@@ -20,8 +20,8 @@ function BurgerBuilder(props) {
   const error = useSelector (state => state.burgerBuilder.error );
   const building = useSelector(state => state.burgerBuilder.building ) ; 
   const dispatch = useDispatch();
-  useCallback((ingName) => dispatch(actions.removeIngs(ingName)),[input],)
 
+  
   const lessHandeler =  (ingName) => dispatch(actions.removeIngs(ingName));
   
   const moreHandeler = (ingName) => dispatch(actions.addIngs(ingName));
