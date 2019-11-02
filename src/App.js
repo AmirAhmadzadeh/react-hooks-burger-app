@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import Layout from './components/Layout/Layout';
 import Aux from './hoc/Aux';
 import Routes from './Routes/Routes';
-import { connect,useDispatch, useSelector } from 'react-redux';
+import { connect } from 'react-redux';
 import * as actions from './store/actions/index';
 import { withRouter } from 'react-router-dom';
 
@@ -11,13 +11,13 @@ function App(props) {
 
     useEffect(() => {
         props.checkUser();
-    }) ; 
+    },[]) ; 
     
     return (
 
         <Aux>
             <Layout>
-                <Routes authenticated={this.props.auth.info.auth} />
+                <Routes authenticated={props.auth.info.auth} />
             </Layout>
         </Aux>
     ) ; 
