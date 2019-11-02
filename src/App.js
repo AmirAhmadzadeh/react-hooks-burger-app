@@ -1,26 +1,26 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import Layout from './components/Layout/Layout';
 import Aux from './hoc/Aux';
 import Routes from './Routes/Routes';
-import { connect } from 'react-redux';
+import { connect,useDispatch, useSelector } from 'react-redux';
 import * as actions from './store/actions/index';
 import { withRouter } from 'react-router-dom';
 
-class App extends Component {
 
-    componentDidMount = () => {
-        this.props.checkUser();
-    }
-    render() {
-        return (
+function App(props) { 
 
-            <Aux>
-                <Layout>
-                    <Routes authenticated={this.props.auth.info.auth} />
-                </Layout>
-            </Aux>
-        )
-    }
+    useEffect(() => {
+        props.checkUser();
+    }) ; 
+    
+    return (
+
+        <Aux>
+            <Layout>
+                <Routes authenticated={this.props.auth.info.auth} />
+            </Layout>
+        </Aux>
+    ) ; 
 }
 
 
@@ -33,9 +33,9 @@ const mapDispatchToProps = dispatch => {
 }
 
 
-const mapStateToProps = state => { 
-    return  {
-          auth : state.auth   
+const mapStateToProps = state => {
+    return {
+        auth: state.auth
     }
 }
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));
